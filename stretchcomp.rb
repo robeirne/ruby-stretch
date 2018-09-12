@@ -82,17 +82,28 @@ end
 
 def path_maker(infile, spec_dir, spec_file)
 	inpath  = Pathname.new(infile)
-	in_dir  = inpath.dirname
-	in_base_ext = inpath.basename
+	#in_dir  = inpath.dirname
+	#in_base_ext = inpath.basename
 	in_base = inpath.basename ".*"
-	in_ext  = inpath.extname
+	#in_ext  = inpath.extname
 
 	outpath = Pathname.new("")
 
-	#if spec_dir.len > 0
-		#outpath.
+	if spec_dir.length > 0
+		outpath = outpath.join(spec_dir)
+	end
+
+	if spec_file.length > 0
+		outpath = outpath.join(spec_file)
+	else
+		outpath = outpath.join(in_base)
+	end
+
+	if outpath.extname.length < 1
+		outpath = outpath.sub_ext("_pp.tif")
+	end
 	
-	return outpath
+	return outpath.to_s
 end
 
 valid_files = []
@@ -101,8 +112,8 @@ ARGV.each do |arg|
 end
 
 valid_files.each do |file|
-	puts file
-	puts path_maker(file, options.outdir, options.outfile)
-	#image = Vips::Image.new_from_file file
-	#image.resize(options.scale_width, {vscale: options.scale_height}).write_to_file "test_out.tif"
+	output_file = path_maker(file, options.outdir, options.outfile)
+	puts "#{file}\t>>\t#{output_file}" 
+	image = Vips::Image.new_from_file file
+	image.resize(options.scale_width, vscale: options.scale_height).write_to_file output_file
 end
